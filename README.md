@@ -13,12 +13,12 @@ Banks generate large volumes of transactional data daily through customer accoun
 The Banking Transaction Analysis System simulates a modern banking analytics workflow by organizing raw transaction data into structured, analytics-ready datasets. Using SQL tools, the project demonstrates how banking data can be processed, analyzed, and transformed into meaningful business insights.
 # The questions I wanted to answer through my SQL queries were:
 
-1. Total balance per customer ?
-2. Monthly deposits vs withdrawals ?
-3. Top 3 customers by balance ?
-4. Identify high-risk customers with large debits ?
-5. Find inactive (dormant) accounts ?
-6. Running balance per account ?
+1. Total balance per customer?
+2. Monthly deposits vs withdrawals?
+3. Top 3 customers by balance?
+4. Identify high-risk customers with large debits?
+5. Find inactive (dormant) accounts?
+6. Running balance per account?
 
 # Tools I Used
 
@@ -54,14 +54,14 @@ In the Banking Transaction Analysis System, this analysis is performed using SQL
 * Feed downstream analytics and executive dashboards
 
 
-![Total_balance_per_customers](Images\total_customer_balances_bar_chart.png)
+![Total_balance_per_customers](Images/total_customer_balances_bar_chart.png)
 
 
-*Bar graph visualizing the total balance per customera; ChatGPT generated this graph from My SQL query results
+*Bar graph visualizing the total balance per customer; ChatGPT generated this graph from MySQL query results
 *
 ## Top 3 Customers by Balance
 
-This analysis retrieve the names and aggregate balances of the top three wealthiest customers in the database.
+This analysis retrieves the names and aggregate balances of the top three wealthiest customers in the database.
 ``` SQL
 SELECT full_name, total_balance
 FROM (
@@ -75,11 +75,11 @@ FROM (
 ) ranked
 WHERE rank_no <= 3;
 ```
-This SQL query is designed to identify the top three customers based on their total combined account balances, The query joins the customers table with the accounts table and calculates the sum of all account balances (SUM(a.balance)) for each individual customer. and utilizes the RANK() window function to assign a numerical rank to each customer, ordering them from the highest total balance to the lowest.
+This SQL query is designed to identify the top three customers based on their total combined account balances, The query joins the customers table with the accounts table and calculates the sum of all account balances (SUM(a.balance)) for each customer. and utilizes the RANK() window function to assign a numerical rank to each customer, ordering them from the highest total balance to the lowest.
 
-![Top_3_Customesr_by_Balance](Images\Top_3_customer_by_balance.png)
+![Top_3_Customesr_by_Balance](Images/Top_3_customer_by_balance.png)
 
-*Pie chart visualizing the top_3_Customers balance; ChatGPT generated this graph from My SQL query results
+*Pie chart visualizing the top_3_Customers balance; ChatGPT generated this graph from MySQL query results
 *
 
 ## Running Balance per Account
@@ -104,11 +104,11 @@ SELECT
 FROM transactions
 ORDER BY account_id, transaction_date;
 ```
-The query uses a CASE statement to determine the impact of a transaction. 'Credit' types are treated as positive values, while all other types (e.g., 'Debit' or 'Withdrawal') are treated as negative values. It employs the SUM() window function combined with OVER() to aggregate values dynamically.Resets the calculation for each unique account so balances don't bleed into one another.
+The query uses a CASE statement to determine the impact of a transaction. 'Credit' types are treated as positive values, while all other types (e.g., 'Debit' or 'Withdrawal') are treated as negative values. It employs the SUM() window function combined with OVER() to aggregate values dynamically. Resets the calculation for each unique account so balances don't bleed into one another.
 
-![Running_Balance_per_Account](Images\Running_balance.png)
+![Running_Balance_per_Account](Images/Running_balance.png)
 
-*Line chart visualizing the Running_balance-per_account; ChatGPT generated this graph from My SQL query results
+*Line chart visualizing the Running_balance-per_account; ChatGPT generated this graph from MySQL query results
 *
 
 ## Monthly Deposits vs Withdrawals
@@ -123,7 +123,7 @@ FROM transactions
 GROUP BY DATE_TRUNC('month', transaction_date)
 ORDER BY month;
 ```
-- **Time Grouping:** It uses the DATE_TRUNC('month', transaction_date) function to normalize all transaction dates to the first day of their respective month. This ensures that transactions from January 5th and January 20th are grouped together under "January."
+- **Time Grouping:** It uses the DATE_TRUNC('month', transaction_date) function to normalize all transaction dates to the first day of their respective month. This ensures that transactions from January 5th and January 20th are grouped under "January."
 - **Categorical Summation (Pivoting):** Instead of listing all transactions, the query uses Conditional Aggregation (SUM with CASE statements):
 
 - **total_credit:** Sums the amount only if the type is 'Credit'.
@@ -151,7 +151,7 @@ HAVING MAX(t.transaction_date) < CURRENT_DATE - INTERVAL '60 days'
 
 - **Urgency Ranking:** Sorting the bars from most inactive to least inactive helps prioritize which customers to contact first.
 
-![Identify_Dormant_Account](Images\Dormant_Account.png)
+![Identify_Dormant_Account](Images/Dormant_Account.png)
 
 ### Visualization Details:
 - **X-Axis:** Account ID (treated as a label).
@@ -160,7 +160,7 @@ HAVING MAX(t.transaction_date) < CURRENT_DATE - INTERVAL '60 days'
 
 - **Visual Cue:** A horizontal red dashed line marks the 60-day threshold.
 
-*Bar chart visualizing the Identification of a Dormant Account; ChatGPT generated this graph from My SQL query results
+*Bar chart visualizing the Identification of a Dormant Account; ChatGPT generated this graph from MySQL query results
 *
 
 ## High Risk Customers With Large Debit Transactions
@@ -182,7 +182,7 @@ WHERE c.risk_category = 'High'
   ```
  - **Multi-Level Data Linking:** The query performs a double join—linking Customers to their Accounts, and those accounts to their specific Transactions. This provides a full audit trail from the individual's profile to a specific financial event.
 
-- **Risk Filtering:** It specifically targets the High risk segment, which is typically defined by compliance or credit departments.
+- **Risk Filtering:** It specifically targets the high-risk segment, which is typically defined by compliance or credit departments.
 
 - **Behavioral Trigger:** It filters for Debit types to focus on money leaving the bank, rather than incoming deposits.
 
@@ -208,7 +208,7 @@ SELECT
     ts.total_debit,
     CASE
         WHEN ts.total_debit > 300000 AND ts.txn_count > 3 THEN 'High Risk'
-        WHEN ts.total_debit > 150000 THEN 'Medium Risk'
+        WHEN ts.total_debit > 150000 THEN 'Medium Risk.'
         ELSE 'Low Risk'
     END AS fraud_risk_score
 FROM transaction_summary ts
@@ -220,9 +220,9 @@ JOIN customers c ON ts.customer_id = c.customer_id;
 
 - **Risk Distribution Bar Chart:** A summary chart showing how many customers fall into each risk category (Low, Medium, High).
 
-![Risk_score](Images\Risk_Score.png)
+![Risk_score](Images/Risk_Score.png)
 
-![Fraud_risk_assessment](Images\fraud_risk_assessment.png)
+![Fraud_risk_assessment](Images/fraud_risk_assessment.png)
 
 ## Visualization Highlights:
 - **X-Axis (Scatter):** Number of transactions per customer.
@@ -231,15 +231,15 @@ JOIN customers c ON ts.customer_id = c.customer_id;
 
 - **Color Coding:** Indicates the fraud_risk_score (e.g., Low, Medium, High) so you can see the clustering of risk groups.
 
-*These charts visualizing the CTEs_Example_Fraud_Suspicion_Score; ChatGPT generated this graph from My SQL query results
+*These charts visualize the CTEs_Example_Fraud_Suspicion_Score; ChatGPT generated this graph from MySQL query results
 *
 
 # What I Learned
 
-- To Designe a normalized relational database with customers, accounts, and transactions.
-- To Write complex SQL queries using JOINs, aggregations, and CTEs.
-- To Apply window functions to rank customers and calculate running balances.
-- To Perform monthly transaction trend analysis and identified dormant accounts.
+- To design a normalized relational database with customers, accounts, and transactions.
+- To write complex SQL queries using JOINs, aggregations, and CTEs.
+- To apply window functions to rank customers and calculate running balances.
+- To perform monthly transaction trend analysis and identify dormant accounts.
 - Implemented basic fraud and risk detection logic using transaction behavior.
 - Optimized query performance with indexing strategies.
 
